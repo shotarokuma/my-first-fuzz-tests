@@ -10,21 +10,32 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential clang llvm wget
 
       - name: Install AFL++
         run: |
-          sudo apt-get update
-          sudo apt-get install -y afl++
+         mkdir -p ~/afl
+          cd ~/afl
+          wget http://lcamtuf.coredump.cx/afl/releases/afl-latest.tgz
+          tar xzf afl-latest.tgz
+          cd afl-2.52b/
+          make
 
-      - name: Build
+      - name: Configure CMake
         env:
-          CC: afl-clang-fast
-          CXX: afl-clang-fast++
+          CC: ~/afl/afl-2.51b/afl-clang-fast
+          CXX: ~/afl/afl-2.51b/afl-clang-fast++
         run: |
-            mkdir -p build
-            cmake -B build
-            cd build/
-            make
+          mkdir -p build
+          cmake -B build
+  
+      - name: Build with CMake
+        run: cmake --build build
+  
 
       - name: Run AFL++ Fuzzer with Workers
         env:
