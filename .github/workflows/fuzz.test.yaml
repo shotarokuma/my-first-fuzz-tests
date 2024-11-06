@@ -26,12 +26,9 @@ jobs:
           sudo make install
 
       - name: Configure CMake
-        env:
-          CC: ~/afl/AFLplusplus/afl-clang-fast
-          CXX: ~/afl/AFLplusplus/afl-clang-fast++
         run: |
           mkdir -p build
-          cmake -B build
+          CC=~/afl/AFLplusplus/afl-clang-fast CXX=~/afl/AFLplusplus/afl-clang-fast++ cmake -B build
   
       - name: Build with CMake
         run: cmake --build build
