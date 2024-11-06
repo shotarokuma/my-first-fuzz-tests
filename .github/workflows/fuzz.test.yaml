@@ -1,0 +1,43 @@
+name: Fuzz Test
+
+on:
+  push:
+    branches: master
+
+jobs:
+  fuzz-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install AFL++
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y afl++
+
+      - name: Configure CMake
+        run: CC=afl-clang-fast CXX=afl-clang-fast++ cmake -B ${{github.workspace}}/build
+
+      - name: Build with CMake
+        run: cmake --build ${{github.workspace}}/build
+      
+      - name: Compile
+        run: |
+            cd build/
+            make
+
+      - name: Run AFL++ Fuzzer with Workers
+        env:
+          AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES: 1
+        run: |
+            afl-fuzz -M master -i ./testcases -o ./fuzz_outputs -- ./build/afldemo @@ &
+
+            afl-fuzz -S worker1 -i ./testcases -o ./fuzz_outputs -- ./build/afldemo @@ &
+            wait
+      
+      - name: Upload Fuzzing Outputs as Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-outputs
+          path: ${{github.workspace}}/fuzz_outputs/
