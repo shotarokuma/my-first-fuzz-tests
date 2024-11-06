@@ -16,14 +16,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y afl++
 
-      - name: Configure CMake
-        run: CC=afl-clang-fast CXX=afl-clang-fast++ cmake -B ${{github.workspace}}/build
-
-      - name: Build with CMake
-        run: cmake --build ${{github.workspace}}/build
-      
-      - name: Compile
+      - name: Build
+        env:
+          CC: afl-clang-fast
+          CXX: afl-clang-fast++
         run: |
+            mkdir -p build
+            cmake -B build
             cd build/
             make
 
