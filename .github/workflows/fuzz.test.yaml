@@ -18,8 +18,8 @@ jobs:
 
       - name: Install AFL++
         run: |
-          mkdir -p /afl
-          cd /afl
+          mkdir -p ${{github.workspace}}/afl
+          cd ${{github.workspace}}/afl
           wget http://lcamtuf.coredump.cx/afl/releases/afl-latest.tgz
           tar xzf afl-latest.tgz
           cd afl-2.52b/
@@ -27,8 +27,8 @@ jobs:
 
       - name: Configure CMake
         env:
-          CC: /afl/afl-2.52b/afl-clang-fast
-          CXX: /afl/afl-2.52b/afl-clang-fast++
+          CC: ${{github.workspace}}/afl/afl-2.52b/afl-clang-fast
+          CXX: ${{github.workspace}}/afl/afl-2.52b/afl-clang-fast++
         run: |
           mkdir -p build
           cmake -B build
